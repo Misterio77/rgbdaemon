@@ -100,7 +100,7 @@ bindings() {
     echo "bind thumb11:minus" > $MOUSE_DEVICE
     echo "bind thumb12:equal" > $MOUSE_DEVICE
     echo "bind dpiup:mouse4" > $MOUSE_DEVICE
-    echo "bind dpidn:mouse5" > $mouse
+    echo "bind dpidn:mouse5" > $MOUSE_DEVICE
 }
 
 startup() {
