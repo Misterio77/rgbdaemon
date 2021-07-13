@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
-export color_primary=$(pastel mix $COLOR_BACKGROUND --fraction 0.7 $base05 | pastel darken 0.1 | pastel saturate 0.5 | pastel format hex | cut -d '#' -f2)
-export color_secondary=$(pastel darken 0.1 $COLOR_SECONDARY | pastel saturate 0.8 | pastel format hex | cut -d '#' -f2)
-export color_tertiary=$(pastel saturate 0.1 $COLOR_TERTIARY | pastel format hex | cut -d '#' -f2)
-export color_quaternary=$(pastel lighten 0.1 $COLOR_QUATERNARY | pastel format hex | cut -d '#' -f2)
+PASTEL_BIN=${PASTEL_BIN:-/usr/bin/pastel}
+PACTL_BIN=${PACTL_BIN:-/usr/bin/pactl}
+PLAYERCTL_BIN=${PLAYERCTL_BIN:-/usr/bin/playerctl}
+SWAYMSG_BIN=${SWAYMSG_BIN:-/usr/bin/swaymsg}
+
+color_primary=$($PASTEL_BIN mix $COLOR_BACKGROUND --fraction 0.7 $base05 | $PASTEL_BIN darken 0.1 | $PASTEL_BIN saturate 0.5 | $PASTEL_BIN format hex | cut -d '#' -f2)
+color_secondary=$($PASTEL_BIN darken 0.1 $COLOR_SECONDARY | $PASTEL_BIN saturate 0.8 | $PASTEL_BIN format hex | cut -d '#' -f2)
+color_tertiary=$($PASTEL_BIN saturate 0.1 $COLOR_TERTIARY | $PASTEL_BIN format hex | cut -d '#' -f2)
+color_quaternary=$($PASTEL_BIN lighten 0.1 $COLOR_QUATERNARY | $PASTEL_BIN format hex | cut -d '#' -f2)
 
 base_colors() {
     echo "rgb $1" > $KEYBOARD_DEVICE
@@ -17,10 +22,10 @@ setcolor() {
 }
 
 daemon_mute() {
-    audio_input=$(pactl info | grep "Default Source" | cut -f3 -d " ")
-    audio_output=$(pactl info | grep "Default Sink" | cut -f3 -d " ")
-    input_muted=$(pactl list sources | grep -A 10 "${audio_input}" | grep "Mute" | cut -d ":" -f2 | xargs)
-    output_muted=$(pactl list sinks | grep -A 10 "${audio_output}" | grep "Mute" | cut -d ":" -f2 | xargs)
+    audio_input=$($PACTL_BIN info | grep "Default Source" | cut -f3 -d " ")
+    audio_output=$($PACTL_BIN info | grep "Default Sink" | cut -f3 -d " ")
+    input_muted=$($PACTL_BIN list sources | grep -A 10 "${audio_input}" | grep "Mute" | cut -d ":" -f2 | xargs)
+    output_muted=$($PACTL_BIN list sinks | grep -A 10 "${audio_output}" | grep "Mute" | cut -d ":" -f2 | xargs)
 
     if [[ "$output_muted" == "yes" ]] && [[ "$input_muted" == "yes" ]]; then
         setcolor "mute" "$4" $KEYBOARD_DEVICE
@@ -57,7 +62,7 @@ daemon_workspaces() {
         else
             workspaces[$num]=$2
         fi
-    done <<<$(swaymsg -t get_workspaces -p | grep Workspace)
+    done <<<$($SWAYMSG_BIN -t get_workspaces -p | grep Workspace)
     for num in $(seq 0 9); do
         color=${workspaces[$num]}
         if [ -z "$color" ]; then
@@ -67,7 +72,7 @@ daemon_workspaces() {
     done
 }
 daemon_player() {
-    status=$(playerctl status 2>/dev/null | head -n 1)
+    status=$($PLAYERCTL_BIN status 2>/dev/null | head -n 1)
     if [[ $status == "Playing" ]]; then
         setcolor "play" $1 $KEYBOARD_DEVICE
     elif [[ $status == "Paused" ]]; then
