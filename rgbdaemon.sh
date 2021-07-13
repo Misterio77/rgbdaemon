@@ -122,7 +122,8 @@ startup() {
 
 off() {
     echo "rgb 000000" > $MOUSE_DEVICE & \
-    echo "rgb 000000" > $KEYBOARD_DEVICE & \
+    echo "rgb 000000" > $KEYBOARD_DEVICE
+    exit
 }
 
 rgb_daemon() {
