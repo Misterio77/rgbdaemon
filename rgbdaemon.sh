@@ -5,11 +5,6 @@ PACTL_BIN=${PACTL_BIN:-/usr/bin/pactl}
 PLAYERCTL_BIN=${PLAYERCTL_BIN:-/usr/bin/playerctl}
 SWAYMSG_BIN=${SWAYMSG_BIN:-/usr/bin/swaymsg}
 
-color_primary=$($PASTEL_BIN mix $COLOR_BACKGROUND --fraction 0.7 $base05 | $PASTEL_BIN darken 0.1 | $PASTEL_BIN saturate 0.5 | $PASTEL_BIN format hex | cut -d '#' -f2)
-color_secondary=$($PASTEL_BIN darken 0.1 $COLOR_SECONDARY | $PASTEL_BIN saturate 0.8 | $PASTEL_BIN format hex | cut -d '#' -f2)
-color_tertiary=$($PASTEL_BIN saturate 0.1 $COLOR_TERTIARY | $PASTEL_BIN format hex | cut -d '#' -f2)
-color_quaternary=$($PASTEL_BIN lighten 0.1 $COLOR_QUATERNARY | $PASTEL_BIN format hex | cut -d '#' -f2)
-
 base_colors() {
     echo "rgb $1" > $KEYBOARD_DEVICE
     echo "rgb $1" > $MOUSE_DEVICE
@@ -112,6 +107,11 @@ startup() {
     if [ -n "${rgb_pid}" ]; then
         kill "${rgb_pid}"
     fi
+
+    export color_primary=$($PASTEL_BIN mix $COLOR_BACKGROUND --fraction 0.7 $COLOR_FOREGROUND | $PASTEL_BIN darken 0.1 | $PASTEL_BIN saturate 0.5 | $PASTEL_BIN format hex | cut -d '#' -f2)
+    export color_secondary=$($PASTEL_BIN darken 0.1 $COLOR_SECONDARY | $PASTEL_BIN saturate 0.8 | $PASTEL_BIN format hex | cut -d '#' -f2)
+    export color_tertiary=$($PASTEL_BIN saturate 0.1 $COLOR_TERTIARY | $PASTEL_BIN format hex | cut -d '#' -f2)
+    export color_quaternary=$($PASTEL_BIN lighten 0.1 $COLOR_QUATERNARY | $PASTEL_BIN format hex | cut -d '#' -f2)
 
     echo "dpi 1:$MOUSE_DPI dpisel 1" > $MOUSE_DEVICE
     base_colors $color_primary $color_secondary & \
