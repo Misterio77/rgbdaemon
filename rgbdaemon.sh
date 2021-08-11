@@ -8,7 +8,6 @@ base_colors() {
 }
 
 setcolor() {
-    echo $1 $2 $3
     echo "rgb $1:$2" > $3
 }
 
@@ -57,7 +56,7 @@ daemon_workspaces() {
     for num in $(seq 0 9); do
         color=${workspaces[$num]}
         if [ -z "$color" ]; then
-            color=$5
+            color=$4
         fi
         setcolor "$num" $color $KEYBOARD_DEVICE
     done
