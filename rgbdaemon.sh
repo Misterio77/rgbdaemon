@@ -131,9 +131,13 @@ startup() {
 
     echo "dpi 1:$MOUSE_DPI dpisel 1" > $MOUSE_DEVICE
 
+    # Set up bindings
+    bindings
+
     base_colors $color_primary $color_secondary & \
     #openrgb --client --device 0 --color $color_primary --mode static & \
     rgb_daemon & rgb_pid=$!
+
     wait
 }
 
@@ -161,7 +165,4 @@ rgb_daemon() {
 trap startup SIGHUP
 trap off SIGTERM
 
-# Set up bindings
-bindings
-# Run daemon
 startup
