@@ -8,6 +8,7 @@ base_colors() {
 }
 
 setcolor() {
+    echo $1 $2 $3
     echo "rgb $1:$2" > $3
 }
 
@@ -58,7 +59,7 @@ daemon_workspaces() {
         if [ -z "$color" ]; then
             color=$5
         fi
-        setcolor $num $color $KEYBOARD_DEVICE
+        setcolor "$num" $color $KEYBOARD_DEVICE
     done
 }
 daemon_player() {
@@ -79,8 +80,6 @@ daemon_lock() {
     fi
 }
 bindings() {
-    echo dispositivo: $MOUSE_DEVICE;
-
     echo "bind profswitch:f13" > $KEYBOARD_DEVICE
     echo "bind lock:f14" > $KEYBOARD_DEVICE
     echo "bind light:f15" > $KEYBOARD_DEVICE
