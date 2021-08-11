@@ -133,14 +133,14 @@ off() {
 
 rgb_daemon() {
     while sleep $DAEMON_INTERVAL; do
-        [[ "$ENABLE_WORKSPACES" == 1 ]] && \
+        [[ "$ENABLE_SWAY_WORKSPACES" == 1 ]] && \
             daemon_workspaces $color_secondary $color_tertiary $color_quaternary $color_primary & \
+        [[ "$ENABLE_SWAY_LOCK" == 1 ]] && \
+            daemon_lock $color_secondary $color_primary & \
         [[ "$ENABLE_MUTE" == 1 ]] && \
             daemon_mute "000000" $color_primary $color_tertiary $color_secondary & \
         [[ "$ENABLE_TTY" == 1 ]] && \
             daemon_tty $color_secondary $color_tertiary $color_primary & \
-        [[ "$ENABLE_LOCK" == 1 ]] && \
-            daemon_lock $color_secondary $color_primary & \
         [[ "$ENABLE_PLAYER" == 1 ]] && \
             daemon_player $color_secondary $color_tertiary $color_primary & \
     done
