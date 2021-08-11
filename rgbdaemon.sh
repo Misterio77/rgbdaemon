@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
+source ${XDG_CONFIG_HOME:-$HOME/.config}/rgbdaemon.conf
+
 PASTEL_BIN=${PASTEL_BIN:-/usr/bin/pastel}
 PACTL_BIN=${PACTL_BIN:-/usr/bin/pactl}
 PLAYERCTL_BIN=${PLAYERCTL_BIN:-/usr/bin/playerctl}
 SWAYMSG_BIN=${SWAYMSG_BIN:-/usr/bin/swaymsg}
+DAEMON_INTERVAL=${DAEMON_INTERVAL:-0.8}
+KEYBOARD_DEVICE=${KEYBOARD_DEVICE:-/dev/input/ckb1/cmd}
+MOUSE_DEVICE=${MOUSE_DEVICE:-/dev/input/ckb2/cmd}
 
 base_colors() {
     echo "rgb $1" > $KEYBOARD_DEVICE
