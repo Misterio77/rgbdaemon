@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-source ${XDG_CONFIG_HOME:-$HOME/.config}/rgbdaemon.conf
-
-PASTEL_BIN=${PASTEL_BIN:-/usr/bin/pastel}
-PACTL_BIN=${PACTL_BIN:-/usr/bin/pactl}
-PLAYERCTL_BIN=${PLAYERCTL_BIN:-/usr/bin/playerctl}
-SWAYMSG_BIN=${SWAYMSG_BIN:-/usr/bin/swaymsg}
-DAEMON_INTERVAL=${DAEMON_INTERVAL:-0.8}
-KEYBOARD_DEVICE=${KEYBOARD_DEVICE:-/dev/input/ckb1/cmd}
-MOUSE_DEVICE=${MOUSE_DEVICE:-/dev/input/ckb2/cmd}
-
 base_colors() {
     echo "rgb $1" > $KEYBOARD_DEVICE
     echo "rgb $1" > $MOUSE_DEVICE
@@ -89,6 +79,8 @@ daemon_lock() {
     fi
 }
 bindings() {
+    echo dispositivo: $MOUSE_DEVICE;
+
     echo "bind profswitch:f13" > $KEYBOARD_DEVICE
     echo "bind lock:f14" > $KEYBOARD_DEVICE
     echo "bind light:f15" > $KEYBOARD_DEVICE
@@ -113,12 +105,34 @@ startup() {
         kill "${rgb_pid}"
     fi
 
+    source ${XDG_CONFIG_HOME:-$HOME/.config}/rgbdaemon.conf
+
+    export PASTEL_BIN=${PASTEL_BIN:-/usr/bin/pastel}
+    export PACTL_BIN=${PACTL_BIN:-/usr/bin/pactl}
+    export PLAYERCTL_BIN=${PLAYERCTL_BIN:-/usr/bin/playerctl}
+    export SWAYMSG_BIN=${SWAYMSG_BIN:-/usr/bin/swaymsg}
+    export DAEMON_INTERVAL=${DAEMON_INTERVAL:-0.8}
+    export KEYBOARD_DEVICE=${KEYBOARD_DEVICE:-/dev/input/ckb1/cmd}
+    export MOUSE_DEVICE=${MOUSE_DEVICE:-/dev/input/ckb2/cmd}
+    export KEYBOARD_HIGHLIGHTED=${KEYBOARD_HIGHLIGHTED}
+    export MOUSE_HIGHLIGHTED=${KEYBOARD_HIGHLIGHTED}
+    export ENABLE_SWAY_WORKSPACES=${ENABLE_SWAY_WORKSPACES}
+    export ENABLE_SWAY_LOCK=${ENABLE_SWAY_LOCK}
+    export ENABLE_MUTE=${ENABLE_MUTE}
+    export ENABLE_TTY=${ENABLE_TTY}
+    export ENABLE_PLAYER=${ENABLE_PLAYER}
+
     export color_primary=$($PASTEL_BIN mix $COLOR_BACKGROUND --fraction 0.7 $COLOR_FOREGROUND | $PASTEL_BIN darken 0.1 | $PASTEL_BIN saturate 0.5 | $PASTEL_BIN format hex | cut -d '#' -f2)
     export color_secondary=$($PASTEL_BIN darken 0.1 $COLOR_SECONDARY | $PASTEL_BIN saturate 0.8 | $PASTEL_BIN format hex | cut -d '#' -f2)
     export color_tertiary=$($PASTEL_BIN saturate 0.1 $COLOR_TERTIARY | $PASTEL_BIN format hex | cut -d '#' -f2)
     export color_quaternary=$($PASTEL_BIN lighten 0.1 $COLOR_QUATERNARY | $PASTEL_BIN format hex | cut -d '#' -f2)
 
+    # Activate devices
+    echo active > $KEYBOARD_DEVICE || exit -1
+    echo active > $MOUSE_DEVICE || exit -1
+
     echo "dpi 1:$MOUSE_DPI dpisel 1" > $MOUSE_DEVICE
+
     base_colors $color_primary $color_secondary & \
     #openrgb --client --device 0 --color $color_primary --mode static & \
     rgb_daemon & rgb_pid=$!
@@ -148,10 +162,6 @@ rgb_daemon() {
 
 trap startup SIGHUP
 trap off SIGTERM
-
-# Activate devices
-echo active > $KEYBOARD_DEVICE || exit -1
-echo active > $MOUSE_DEVICE || exit -1
 
 # Set up bindings
 bindings
