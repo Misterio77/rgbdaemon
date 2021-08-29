@@ -62,7 +62,10 @@ daemon_workspaces() {
     done
 }
 daemon_player() {
-    status=$($PLAYERCTL_BIN status 2>/dev/null | head -n 1)
+    if [ -n "$PREFERREDPLAYER_BIN" ]; then
+        playerctl_args="--player=$($PREFERREDPLAYER_BIN)"
+    fi
+    status=$($PLAYERCTL_BIN $playerctl_args status 2>/dev/null | head -n 1)
     if [[ $status == "Playing" ]]; then
         setcolor "play" $1 $KEYBOARD_DEVICE
     elif [[ $status == "Paused" ]]; then
