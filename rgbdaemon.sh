@@ -137,8 +137,13 @@ startup() {
     # Set up bindings
     bindings
 
+    throttle=$(x56linux -l | grep Throttle | cut -d  ':' -f 1)
+    joystick=$(x56linux -l | grep Joystick | cut -d  ':' -f 1)
+
     base_colors $color_primary $color_secondary & \
     #openrgb --client --device 0 --color $color_primary --mode static & \
+    x56linux -d $throttle --rgb $($PASTEL_BIN format rgb $color_primary | cut -d '(' -f2 | cut -d ')' -f1 | tr -d ' ') & \
+    x56linux -d $joystick --rgb $($PASTEL_BIN format rgb $color_primary | cut -d '(' -f2 | cut -d ')' -f1 | tr -d ' ') & \
     rgb_daemon & rgb_pid=$!
 
     wait
