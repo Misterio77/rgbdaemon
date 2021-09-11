@@ -142,7 +142,7 @@ startup() {
 
     base_colors $color_primary $color_secondary & \
     #openrgb --client --device 0 --color $color_primary --mode static & \
-    x56linux -d $throttle --rgb $($PASTEL_BIN format rgb $color_primary | cut -d '(' -f2 | cut -d ')' -f1 | tr -d ' ') & \
+    x56linux -d $throttle --rgb $($PASTEL_BIN format rgb $color_secondary | cut -d '(' -f2 | cut -d ')' -f1 | tr -d ' ') & \
     x56linux -d $joystick --rgb $($PASTEL_BIN format rgb $color_primary | cut -d '(' -f2 | cut -d ')' -f1 | tr -d ' ') & \
     rgb_daemon & rgb_pid=$!
 
