@@ -108,6 +108,7 @@ startup() {
 
     source ${XDG_CONFIG_HOME:-$HOME/.config}/rgbdaemon.conf
 
+    export OPENRGB_BIN=${OPENRGB_BIN:-/usr/bin/openrgb}
     export PASTEL_BIN=${PASTEL_BIN:-/usr/bin/pastel}
     export PACTL_BIN=${PACTL_BIN:-/usr/bin/pactl}
     export PLAYERCTL_BIN=${PLAYERCTL_BIN:-/usr/bin/playerctl}
@@ -137,13 +138,8 @@ startup() {
     # Set up bindings
     bindings
 
-    throttle=$(x56linux -l | grep Throttle | cut -d  ':' -f 1)
-    joystick=$(x56linux -l | grep Joystick | cut -d  ':' -f 1)
-
     base_colors $color_primary $color_secondary & \
-    #openrgb --client --device 0 --color $color_primary --mode static & \
-    x56linux -d $throttle --rgb $($PASTEL_BIN format rgb $color_secondary | cut -d '(' -f2 | cut -d ')' -f1 | tr -d ' ') & \
-    x56linux -d $joystick --rgb $($PASTEL_BIN format rgb $color_primary | cut -d '(' -f2 | cut -d ')' -f1 | tr -d ' ') & \
+    $OPENRGB_BIN --client --color $color_primary --mode static & \
     rgb_daemon & rgb_pid=$!
 
     wait
@@ -152,6 +148,7 @@ startup() {
 off() {
     echo "rgb 000000" > $MOUSE_DEVICE & \
     echo "rgb 000000" > $KEYBOARD_DEVICE
+    $OPENRGB_BIN --client --color "000000" --mode static
     exit
 }
 
