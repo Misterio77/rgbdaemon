@@ -12,10 +12,10 @@ setcolor() {
 }
 
 daemon_mute() {
-    audio_input=$($PACTL_BIN info | grep "Default Source" | cut -f3 -d " ")
-    audio_output=$($PACTL_BIN info | grep "Default Sink" | cut -f3 -d " ")
-    input_muted=$($PACTL_BIN list sources | grep -A 10 "${audio_input}" | grep "Mute" | cut -d ":" -f2 | xargs)
-    output_muted=$($PACTL_BIN list sinks | grep -A 10 "${audio_output}" | grep "Mute" | cut -d ":" -f2 | xargs)
+    audio_input=$(pactl info | grep "Default Source" | cut -f3 -d " ")
+    audio_output=$(pactl info | grep "Default Sink" | cut -f3 -d " ")
+    input_muted=$(pactl list sources | grep -A 10 "${audio_input}" | grep "Mute" | cut -d ":" -f2 | xargs)
+    output_muted=$(pactl list sinks | grep -A 10 "${audio_output}" | grep "Mute" | cut -d ":" -f2 | xargs)
 
     if [[ "$output_muted" == "yes" ]] && [[ "$input_muted" == "yes" ]]; then
         setcolor "mute" "$4" $KEYBOARD_DEVICE
@@ -52,7 +52,7 @@ daemon_workspaces() {
         else
             workspaces[$num]=$2
         fi
-    done <<<$($SWAYMSG_BIN -t get_workspaces -p | grep Workspace)
+    done <<<$(swaymsg -t get_workspaces -p | grep Workspace)
     for num in $(seq 0 9); do
         color=${workspaces[$num]}
         if [ -z "$color" ]; then
@@ -65,7 +65,7 @@ daemon_player() {
     if [ -n "$PREFERREDPLAYER_BIN" ]; then
         playerctl_args="--player=$($PREFERREDPLAYER_BIN)"
     fi
-    status=$($PLAYERCTL_BIN $playerctl_args status 2>/dev/null | head -n 1)
+    status=$(playerctl $playerctl_args status 2>/dev/null | head -n 1)
     if [[ $status == "Playing" ]]; then
         setcolor "play" $1 $KEYBOARD_DEVICE
     elif [[ $status == "Paused" ]]; then
@@ -108,11 +108,6 @@ startup() {
 
     source ${XDG_CONFIG_HOME:-$HOME/.config}/rgbdaemon.conf
 
-    export OPENRGB_BIN=${OPENRGB_BIN:-/usr/bin/openrgb}
-    export PASTEL_BIN=${PASTEL_BIN:-/usr/bin/pastel}
-    export PACTL_BIN=${PACTL_BIN:-/usr/bin/pactl}
-    export PLAYERCTL_BIN=${PLAYERCTL_BIN:-/usr/bin/playerctl}
-    export SWAYMSG_BIN=${SWAYMSG_BIN:-/usr/bin/swaymsg}
     export DAEMON_INTERVAL=${DAEMON_INTERVAL:-0.8}
     export KEYBOARD_DEVICE=${KEYBOARD_DEVICE:-/dev/input/ckb1/cmd}
     export MOUSE_DEVICE=${MOUSE_DEVICE:-/dev/input/ckb2/cmd}
@@ -124,10 +119,10 @@ startup() {
     export ENABLE_TTY=${ENABLE_TTY}
     export ENABLE_PLAYER=${ENABLE_PLAYER}
 
-    export color_primary=$($PASTEL_BIN mix $COLOR_BACKGROUND --fraction 0.7 $COLOR_FOREGROUND | $PASTEL_BIN darken 0.1 | $PASTEL_BIN saturate 0.5 | $PASTEL_BIN format hex | cut -d '#' -f2)
-    export color_secondary=$($PASTEL_BIN darken 0.1 $COLOR_SECONDARY | $PASTEL_BIN saturate 0.8 | $PASTEL_BIN format hex | cut -d '#' -f2)
-    export color_tertiary=$($PASTEL_BIN saturate 0.1 $COLOR_TERTIARY | $PASTEL_BIN format hex | cut -d '#' -f2)
-    export color_quaternary=$($PASTEL_BIN lighten 0.1 $COLOR_QUATERNARY | $PASTEL_BIN format hex | cut -d '#' -f2)
+    export color_primary=$(pastel mix $COLOR_BACKGROUND --fraction 0.7 $COLOR_FOREGROUND | pastel darken 0.1 | pastel saturate 0.5 | pastel format hex | cut -d '#' -f2)
+    export color_secondary=$(pastel darken 0.1 $COLOR_SECONDARY | pastel saturate 0.8 | pastel format hex | cut -d '#' -f2)
+    export color_tertiary=$(pastel saturate 0.1 $COLOR_TERTIARY | pastel format hex | cut -d '#' -f2)
+    export color_quaternary=$(pastel lighten 0.1 $COLOR_QUATERNARY | pastel format hex | cut -d '#' -f2)
 
     # Activate devices
     echo active > $KEYBOARD_DEVICE || exit -1
@@ -139,7 +134,7 @@ startup() {
     bindings
 
     base_colors $color_primary $color_secondary & \
-    $OPENRGB_BIN --client --color $color_primary --mode static & \
+    openrgb --client --color $color_primary --mode static & \
     rgb_daemon & rgb_pid=$!
 
     wait
@@ -148,7 +143,7 @@ startup() {
 off() {
     echo "rgb 000000" > $MOUSE_DEVICE & \
     echo "rgb 000000" > $KEYBOARD_DEVICE
-    $OPENRGB_BIN --client --color "000000" --mode static
+    openrgb --client --color "000000" --mode static
     exit
 }
 
