@@ -123,6 +123,7 @@ startup() {
     export color_secondary=$(pastel darken 0.1 $COLOR_SECONDARY | pastel saturate 0.8 | pastel format hex | cut -d '#' -f2)
     export color_tertiary=$(pastel saturate 0.1 $COLOR_TERTIARY | pastel format hex | cut -d '#' -f2)
     export color_quaternary=$(pastel lighten 0.1 $COLOR_QUATERNARY | pastel format hex | cut -d '#' -f2)
+    echo "COLORS: $color_primary | $color_secondary | $color_tertiary | $color_quaternary"
 
     # Activate devices
     echo active > $KEYBOARD_DEVICE || exit -1
